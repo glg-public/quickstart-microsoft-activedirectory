@@ -123,13 +123,20 @@ Configuration ConfigGlgDC {
             DependsOn = '[NetAdapterName]RenameNetAdapterPrimary'
         }
 
+        DnsConnectionSuffix AddSpecificSuffix
+        {
+            InterfaceAlias           = 'Primary'
+            UseSuffixWhenRegistering = $true
+            DependsOn = '[NetAdapterName]DnsServerAddress'
+        }
+
         # Wait for AD Domain to be up and running
         xWaitForADDomain WaitForPrimaryDC {
             DomainName = $DomainDnsName
             RetryCount = 600
             RetryIntervalSec = 30
             RebootRetryCount = 10
-            DependsOn = '[DnsServerAddress]DnsServerAddress'
+            DependsOn = '[DnsServerAddress]AddSpecificSuffix'
         }
 
         TimeZone TimeZone{
