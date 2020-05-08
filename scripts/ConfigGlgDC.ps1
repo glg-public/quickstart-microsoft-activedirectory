@@ -205,8 +205,8 @@ Configuration ConfigGlgDC {
         DnsConnectionSuffix AddSpecificSuffix
         {
             InterfaceAlias           = 'Primary'
-            ConnectionSpecificSuffix = $DomainDnsName
             UseSuffixWhenRegistering = $true
+            ConnectionSpecificSuffix = $DomainDnsName
             DependsOn = '[xADDomainController]SecondaryDC'
         }
     }
