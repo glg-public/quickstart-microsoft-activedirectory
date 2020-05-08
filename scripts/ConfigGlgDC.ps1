@@ -14,10 +14,7 @@ param(
     [string]$DNSServer,
 
     [Parameter(Mandatory=$true)]
-    [string]$ADAdminSecParam,
-
-    [Parameter(Mandatory=$true)]
-    [string]$InstanceTimeZone
+    [string]$ADAdminSecParam
 )
 
 # Grabbing Mac Address for Primary Interface to Rename Interface
@@ -136,7 +133,7 @@ Configuration ConfigGlgDC {
 
         TimeZone TimeZone{
             IsSingleInstance = 'Yes'
-            TimeZone         = "$InstanceTimeZone"
+            TimeZone         = 'Eastern Standard Time'
         }
         
         # Rename Computer and Join Domain
