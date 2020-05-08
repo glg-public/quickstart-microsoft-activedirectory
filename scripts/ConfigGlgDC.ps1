@@ -126,6 +126,7 @@ Configuration ConfigGlgDC {
         DnsConnectionSuffix AddSpecificSuffix
         {
             InterfaceAlias           = 'Primary'
+            ConnectionSpecificSuffix = $DomainDnsName
             UseSuffixWhenRegistering = $true
             DependsOn = '[NetAdapterName]DnsServerAddress'
         }
