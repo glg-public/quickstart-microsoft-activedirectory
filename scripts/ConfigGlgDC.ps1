@@ -50,7 +50,7 @@ Configuration ConfigGlgDC {
     (
         [PSCredential] $Credentials
     )
-    
+
     # Importing DSC Modules needed for Configuration
     Import-Module -Name PSDesiredStateConfiguration
     Import-Module -Name xActiveDirectory
@@ -58,7 +58,7 @@ Configuration ConfigGlgDC {
     Import-Module -Name ActiveDirectoryCSDsc
     Import-Module -Name ComputerManagementDsc
     Import-Module -Name xDnsServer
-    
+
     # Importing All DSC Resources needed for Configuration
     Import-DscResource -Module PSDesiredStateConfiguration
     Import-DscResource -Module NetworkingDsc
@@ -66,13 +66,13 @@ Configuration ConfigGlgDC {
     Import-DscResource -Module ActiveDirectoryCSDsc
     Import-DscResource -Module ComputerManagementDsc
     Import-DscResource -Module xDnsServer
-    
+
     # Node Configuration block, since processing directly on DC using localhost
     Node 'localhost' {
 
       Script DisableIESecurity
       {
-        SetScript = 
+        SetScript =
         {
           $AdminKey = "HKLM:\SOFTWARE\Microsoft\Active Setup\Installed Components\{A509B1A7-37EF-4b3f-8CFC-4F3A74704073}"
           $UserKey = "HKLM:\SOFTWARE\Microsoft\Active Setup\Installed Components\{A509B1A8-37EF-4b3f-8CFC-4F3A74704073}"
@@ -82,16 +82,16 @@ Configuration ConfigGlgDC {
         GetScript =  { @{} }
         TestScript = { $false }
       }
-      
+
       Script DisableFeedback
       {
-        SetScript = 
+        SetScript =
         {
           New-Item -ErrorAction SilentlyContinue -Path "HKCU:SOFTWARE\Microsoft\Siuf\Rules" -Force | Out-Null
           Set-ItemProperty -ErrorAction SilentlyContinue -Path "HKCU:SOFTWARE\Microsoft\Siuf\Rules" -Name NumberOfSIUFInPeriod -Value 0 -Force | Out-Null
-          if ((Get-ItemProperty -Path "HKCU:SOFTWARE\Microsoft\Siuf\Rules" -Name PeriodInNanoSeconds -ErrorAction SilentlyContinue) -ne $null) 
-          { 
-            Remove-ItemProperty -Path "HKCU:SOFTWARE\Microsoft\Siuf\Rules" -Name PeriodInNanoSeconds 
+          if ((Get-ItemProperty -Path "HKCU:SOFTWARE\Microsoft\Siuf\Rules" -Name PeriodInNanoSeconds -ErrorAction SilentlyContinue) -ne $null)
+          {
+            Remove-ItemProperty -Path "HKCU:SOFTWARE\Microsoft\Siuf\Rules" -Name PeriodInNanoSeconds
           }
         }
         GetScript =  { @{} }
@@ -100,14 +100,14 @@ Configuration ConfigGlgDC {
 
       Script DisableUpdates
       {
-        SetScript = 
+        SetScript =
         {
           Set-ItemProperty -Path HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU -Name NoAutoUpdate -Value 1
         }
         GetScript =  { @{} }
         TestScript = { $false }
       }
-      
+
       # Renaming Primary Adapter in order to Static the IP for AD installation
         NetAdapterName RenameNetAdapterPrimary {
             NewName    = 'Primary'
@@ -122,7 +122,7 @@ Configuration ConfigGlgDC {
             AddressFamily  = 'IPv4'
             DependsOn = '[NetAdapterName]RenameNetAdapterPrimary'
         }
-            
+
         # Wait for AD Domain to be up and running
         xWaitForADDomain WaitForPrimaryDC {
             DomainName = $DomainDnsName
@@ -136,7 +136,7 @@ Configuration ConfigGlgDC {
             IsSingleInstance = 'Yes'
             TimeZone         = 'Eastern Standard Time'
         }
-        
+
         # Rename Computer and Join Domain
         Computer JoinDomain {
             Name = $ThisDCNetBIOSName
@@ -144,38 +144,38 @@ Configuration ConfigGlgDC {
             Credential = $Credentials
             DependsOn = "[xWaitForADDomain]WaitForPrimaryDC"
         }
-        
+
         # Adding Needed Windows Features
         WindowsFeature DNS {
             Ensure = "Present"
             Name = "DNS"
             IncludeAllSubFeature = $true
         }
-        
+
         WindowsFeature AD-Domain-Services {
             Ensure = "Present"
             Name = "AD-Domain-Services"
             DependsOn = "[WindowsFeature]DNS"
         }
-        
+
         WindowsFeature DnsTools {
             Ensure = "Present"
             Name = "RSAT-DNS-Server"
             DependsOn = "[WindowsFeature]DNS"
         }
-        
+
         WindowsFeature RSAT-AD-Tools {
             Name = 'RSAT-AD-Tools'
             Ensure = 'Present'
             DependsOn = "[WindowsFeature]AD-Domain-Services"
         }
-        
+
         WindowsFeature RSAT-ADDS {
             Ensure = "Present"
             Name = "RSAT-ADDS"
             DependsOn = "[WindowsFeature]AD-Domain-Services"
         }
-        
+
         WindowsFeature RSAT-ADDS-Tools {
             Name = 'RSAT-ADDS-Tools'
             Ensure = 'Present'
