@@ -115,8 +115,9 @@ Configuration ConfigGlgDC {
         }
 
         # Setting DNS Server on Primary Interface to point to our existing DNS server
+        # and set secondary DNS as loopback to this server according to best practices
         DnsServerAddress DnsServerAddress {
-            Address = $DNSServer
+            Address = @($DNSServer, '127.0.0.1')
             InterfaceAlias = 'Primary'
             AddressFamily  = 'IPv4'
             DependsOn = '[NetAdapterName]RenameNetAdapterPrimary'
@@ -199,7 +200,7 @@ Configuration ConfigGlgDC {
             DomainAdministratorCredential = $Credentials
             SafemodeAdministratorPassword = $Credentials
             DependsOn = @("[WindowsFeature]AD-Domain-Services","[Computer]JoinDomain")
-        } 
+        }
     }
 }
 
