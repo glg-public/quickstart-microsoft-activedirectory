@@ -136,7 +136,7 @@ Configuration ConfigGlgDC {
 
         TimeZone TimeZone{
             IsSingleInstance = 'Yes'
-            TimeZone         = $InstanceTimeZone
+            TimeZone         = "$InstanceTimeZone"
         }
         
         # Rename Computer and Join Domain
