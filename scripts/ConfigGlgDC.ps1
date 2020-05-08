@@ -14,7 +14,7 @@ param(
     [string]$DNSServer,
 
     [Parameter(Mandatory=$true)]
-    [string]$ADAdminSecParam
+    [string]$ADAdminSecParam,
 
     [Parameter(Mandatory=$true)]
     [string]$InstanceTimeZone
