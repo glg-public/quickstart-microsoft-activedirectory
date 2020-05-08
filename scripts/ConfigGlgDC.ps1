@@ -123,13 +123,23 @@ Configuration ConfigGlgDC {
             DependsOn = '[NetAdapterName]RenameNetAdapterPrimary'
         }
 
+        DnsConnectionSuffix AddSpecificSuffix
+        {
+            InterfaceAlias                 = 'Primary'
+            ConnectionSpecificSuffix       = $DomainDnsName
+            RegisterThisConnectionsAddress = $true
+            UseSuffixWhenRegistering       = $true
+            Ensure                         = "Present"
+            DependsOn                      = "[DnsServerAddress]SetDnsServerAddress"
+        }
+
         # Wait for AD Domain to be up and running
         xWaitForADDomain WaitForPrimaryDC {
             DomainName = $DomainDnsName
             RetryCount = 600
             RetryIntervalSec = 30
             RebootRetryCount = 10
-            DependsOn = '[DnsServerAddress]SetDnsServerAddress'
+            DependsOn = '[DnsConnectionSuffix]AddSpecificSuffix'
         }
 
         TimeZone TimeZone{
@@ -200,16 +210,6 @@ Configuration ConfigGlgDC {
             DomainAdministratorCredential = $Credentials
             SafemodeAdministratorPassword = $Credentials
             DependsOn = @("[WindowsFeature]AD-Domain-Services","[Computer]JoinDomain")
-        }
-
-        Script AddSpecificSuffix
-        {
-          SetScript =
-          {
-            Set-DnsClient -InterfaceAlias "Primary" -UseSuffixWhenRegistering $true -ConnectionSpecificSuffix $DomainDnsName
-          }
-          GetScript =  { @{} }
-          TestScript = { $false }
         }
     }
 }
