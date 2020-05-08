@@ -202,12 +202,14 @@ Configuration ConfigGlgDC {
             DependsOn = @("[WindowsFeature]AD-Domain-Services","[Computer]JoinDomain")
         }
 
-        DnsConnectionSuffix AddSpecificSuffix
+        Script AddSpecificSuffix
         {
-            InterfaceAlias           = 'Primary'
-            UseSuffixWhenRegistering = $true
-            ConnectionSpecificSuffix = $DomainDnsName
-            DependsOn = '[xADDomainController]SecondaryDC'
+          SetScript =
+          {
+            Set-DnsClient -InterfaceAlias "Primary" -UseSuffixWhenRegistering $true -ConnectionSpecificSuffix $DomainDnsName
+          }
+          GetScript =  { @{} }
+          TestScript = { $false }
         }
     }
 }
