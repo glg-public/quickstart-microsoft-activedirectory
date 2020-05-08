@@ -116,7 +116,7 @@ Configuration ConfigGlgDC {
 
         # Setting DNS Server on Primary Interface to point to our existing DNS server
         # and set secondary DNS as loopback to this server according to best practices
-        DnsServerAddress DnsServerAddress {
+        DnsServerAddress SetDnsServerAddress {
             Address = @($DNSServer, '127.0.0.1')
             InterfaceAlias = 'Primary'
             AddressFamily  = 'IPv4'
@@ -128,7 +128,7 @@ Configuration ConfigGlgDC {
             InterfaceAlias           = 'Primary'
             ConnectionSpecificSuffix = $DomainDnsName
             UseSuffixWhenRegistering = $true
-            DependsOn = '[NetAdapterName]DnsServerAddress'
+            DependsOn = '[DnsServerAddress]SetDnsServerAddress'
         }
 
         # Wait for AD Domain to be up and running
@@ -137,7 +137,7 @@ Configuration ConfigGlgDC {
             RetryCount = 600
             RetryIntervalSec = 30
             RebootRetryCount = 10
-            DependsOn = '[DnsServerAddress]AddSpecificSuffix'
+            DependsOn = '[DnsConnectionSuffix]AddSpecificSuffix'
         }
 
         TimeZone TimeZone{
